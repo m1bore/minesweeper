@@ -43,7 +43,7 @@
 
 let field = []; // Debes inicializar field como un array bidimensional
 let tile = 0;
-let bombCount = numberBomb(field);
+let tilesMarked=0;
 
 //TMP:
 function gameOver() {
@@ -85,21 +85,46 @@ function revealCell(row, col) {
     }
     else {
       cell.style.backgroundColor = '#888';
+      const numRows = field.length;
+      const numCols = field[0].length;
+      
+      for (let i = row - 1; i <= row + 1; i++) {
+  for (let j = col - 1; j <= col + 1; j++) {
+    // Verificar si la casilla está dentro de los límites del campo
+    if (i >= 0 && i < numRows && j >= 0 && j < numCols) {
+      const neighborCell = document.getElementById(`cell-${i}-${j}`);
+      // Verificar si la casilla no ha sido revelada aún
+      if (!neighborCell.classList.contains('revealed')) {
+        revealCell(i, j);
+      }
     }
-  
-  
   }
 }
+cell.classList.add('revealed');
 
+    }
+  }
+}
+//FIXME:
 function markCell(event, row, col) {
-  let cm=0;// Evitar el menú contextual predeterminado
+
+  // Evitar el menú contextual predeterminado
   event.preventDefault();
   // Obtener la celda
   const cell = document.getElementById(`cell-${row}-${col}`);
 
-  if (cm<numberBomb(field)) {
-    cell.style.backgroundColor = 'yellow';
-    cm++;
+  if (tilesMarked<numberBomb(field)) {
+    if (!cell.classList.contains('marked')) {
+      cell.style.backgroundColor = 'yellow';
+      cell.classList.add('marked');
+      tilesMarked++;
+    }
+    else {
+      cell.style.backgroundColor = '#aaa';
+      cell.classList.remove('marked');
+      tilesMarked--;
+    }
+    
   }
   // Marcar la celda (puedes cambiar esto según tus necesidades)
   
