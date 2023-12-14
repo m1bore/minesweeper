@@ -5,20 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Juego de campo de minas</title>
   <style>
-    html {
+    body {
       margin: auto;
       padding: 1rem;
+      font-family: Arial, sans-serif;
     }
+
     table {
-      padding: 0.3rem;
-      background-color: #ccc;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-    table * {
-      width: 1ch;
-      height: 2.3ch;
-      padding: 1rem;
+
+    td {
+      width: 30px;
+      height: 30px;
+      padding: 5px;
+      text-align: center;
+      vertical-align: middle;
       background-color: #aaa;
-      cursor: pointer; /* Agrega un estilo de cursor para indicar que es interactivo */
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .bomb-cell {
+      background-color: #fff; /* Change the background color for cells with bombs */
     }
   </style>
 </head>
