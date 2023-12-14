@@ -28,6 +28,9 @@
 'use strict';
 
 let field = []; // Debes inicializar field como un array bidimensional
+let tile = 0;
+let bombCount = numberBomb(field);
+
 //TODO:
 function gameOver() {
   
@@ -38,8 +41,12 @@ function revealCell(row, col) {
   const cell = document.getElementById(`cell-${row}-${col}`);
   // Mostrar el contenido de la celda en la casilla
   
-  if (field[row][col]==="b") {
-    cell.textContent = field[row][col];
+  if (field[row][col] === "b") {
+    const bombImage = document.createElement('img');
+    bombImage.src = 'assets/img/b0b.png';
+    bombImage.alt = 'bomb';
+    cell.innerHTML = '';  // Clear the cell content
+    cell.appendChild(bombImage);
     gameOver();
   }
   else {
@@ -142,14 +149,12 @@ function easy() {
       } else {
         field[i][j] = 0;
       }
+      tile++;
     }
     if (numberBomb(field) >= b) {
       break;
     }
   }
-}
-
-function game() {
   for (let i = 0; i < field.length; i++) {
     for (let j = 0; j < field[i].length; j++) {
       if (field[i][j] !== "b") {
@@ -157,6 +162,11 @@ function game() {
       }
     }
   }
+}
+
+function game() {
+  
+  
 
   crearTabla(field);
 }
