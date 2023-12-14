@@ -8,7 +8,6 @@
     body {
       margin: auto;
       padding: 1rem;
-      font-family: Arial, sans-serif;
     }
 
     table {
@@ -33,7 +32,7 @@
     }
 
     .bomb-cell {
-      background-color: #fff; /* Change the background color for cells with bombs */
+      background-color: #df6a6a; /* Change the background color for cells with bombs */
     }
   </style>
 </head>
@@ -61,11 +60,13 @@ function revealCell(row, col) {
     bombImage.src = 'assets/img/b0b.png';
     bombImage.alt = 'bomb';
     cell.innerHTML = '';  // Clear the cell content
+    cell.classList.add('bomb-cell');
     cell.appendChild(bombImage);
     gameOver();
   }
   else {
   cell.textContent = field[row][col];
+  cell.style.backgroundColor = '#888';
   }
 }
 
