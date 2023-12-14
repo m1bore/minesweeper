@@ -47,7 +47,21 @@ let bombCount = numberBomb(field);
 
 //TODO:
 function gameOver() {
-  
+  // Reveal all bomb cells
+  for (let i = 0; i < field.length; i++) {
+    for (let j = 0; j < field[i].length; j++) {
+      const cell = field[i][j];
+      if (field[i][j] === "b") {
+        const cell = document.getElementById(`cell-${i}-${j}`);
+        const bombImage = document.createElement('img');
+        bombImage.src = 'assets/img/b0b.png';
+        bombImage.alt = 'bomb';
+        cell.innerHTML = '';  // Clear the cell content
+        cell.classList.add('bomb-cell');
+        cell.appendChild(bombImage);
+      }
+    }
+  }
 }
 //FIXME:
 function revealCell(row, col) {
