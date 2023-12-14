@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de campo de minas</title>
+  <style>
+    html {
+      margin: auto;
+      padding: 1rem;
+    }
+    table {
+      padding: 0.3rem;
+      background-color: #ccc;
+    }
+    table * {
+      width: 1ch;
+      height: 2.3ch;
+      padding: 1rem;
+      background-color: #aaa;
+      cursor: pointer; /* Agrega un estilo de cursor para indicar que es interactivo */
+    }
+  </style>
+</head>
+<body>
+
+<script>
+'use strict';
+
+let field = []; // Debes inicializar field como un array bidimensional
+//TODO:
+function gameOver() {
+  
+}
+//FIXME:
+function revealCell(row, col) {
+  // Obtener la celda
+  const cell = document.getElementById(`cell-${row}-${col}`);
+  // Mostrar el contenido de la celda en la casilla
+  
+  if (field[row][col]==="b") {
+    cell.textContent = field[row][col];
+    gameOver();
+  }
+  else {
+  cell.textContent = field[row][col];
+  }
+}
+
+function markCell(event, row, col) {
+  let cm=0;// Evitar el menú contextual predeterminado
+  event.preventDefault();
+  // Obtener la celda
+  const cell = document.getElementById(`cell-${row}-${col}`);
+
+  if (cm<numberBomb(field)) {
+    cell.style.backgroundColor = 'yellow';
+    cm++;
+  }
+  // Marcar la celda (puedes cambiar esto según tus necesidades)
+  
+}
+
+function numberBomb(array) {
+  if (Array.isArray(array)) {
+    let bc = 0;
+    for (let i = 0; i < array.length; i++) {
+      for (let j = 0; j < array[i].length; j++) {
+        if (array[i][j] === "b") {
+          bc++;
+        }
+      }
+    }
+    return bc;
+  } else {
+    return 'error';
+  }
+}
+
+function crearTabla(array) {
+  var contenedorTabla = document.body;
+  var tabla = document.createElement('table');
+  var tbody = document.createElement('tbody');
+
+  array.forEach(function (filaDatos, rowIndex) {
+    var fila = tbody.insertRow();
+
+    filaDatos.forEach(function (dato, colIndex) {
+      var celda = fila.insertCell();
+      celda.textContent = " ";
+      celda.id = `cell-${rowIndex}-${colIndex}`; // Agrega un identificador único a cada celda
+
+      // Agregar evento de clic a cada celda
+      celda.addEventListener('click', function() {
+        revealCell(rowIndex, colIndex);
+      });
+
+      // Agregar evento de clic derecho a cada celda
+      celda.addEventListener('contextmenu', function(event) {
+        markCell(event, rowIndex, colIndex);
+        });
+    });
+  });
+
+  tabla.appendChild(tbody);
+  contenedorTabla.appendChild(tabla);
+}
+
+function countAdjacentBombs(array, row, col) {
+  const numRows = field.length;
+  const numCols = field[0].length;
+  let bombCount = 0;
+
+  for (let i = row - 1; i <= row + 1; i++) {
+    for (let j = col - 1; j <= col + 1; j++) {
+      // Verificar si la casilla está dentro de los límites del campo
+      if (i >= 0 && i < numRows && j >= 0 && j < numCols) {
+        // Verificar si la casilla contiene una bomba
+        if (field[i][j] === "b") {
+          bombCount++;
+        }
+      }
+    }
+  }
+
+  // Restar 1 si la casilla actual también contiene una bomba
+  if (field[row][col] === "b") {
+    bombCount--;
+  }
+
+  return bombCount;
+}
+
+function easy() {
+  for (let i = 0; i < 6; i++) {
+    field[i] = []; // Inicializa cada fila como un array
+    const b = 12;
+    for (let j = 0; j < 6; j++) {
+      const rand = getRandomInt(6);
+      if (rand === 5) {
+        field[i][j] = "b";
+      } else {
+        field[i][j] = 0;
+      }
+    }
+    if (numberBomb(field) >= b) {
+      break;
+    }
+  }
+}
+
+function game() {
+  for (let i = 0; i < field.length; i++) {
+    for (let j = 0; j < field[i].length; j++) {
+      if (field[i][j] !== "b") {
+        field[i][j] = countAdjacentBombs(field, i, j);
+      }
+    }
+  }
+
+  crearTabla(field);
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+easy();
+game();
+</script>
+
+</body>
+</html>
