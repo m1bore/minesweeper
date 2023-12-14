@@ -96,13 +96,15 @@ function revealCell(row, col) {
       // Verificar si la casilla no ha sido revelada aún
       if (!neighborCell.classList.contains('revealed')) {
         revealCell(i, j);
+        cell.classList.add('revealed');
       }
     }
   }
 }
-cell.classList.add('revealed');
+
 
     }
+    cell.classList.add('revealed');
   }
 }
 //FIXME:
@@ -113,20 +115,26 @@ function markCell(event, row, col) {
   // Obtener la celda
   const cell = document.getElementById(`cell-${row}-${col}`);
 
-  if (tilesMarked<numberBomb(field)) {
+ 
     if (!cell.classList.contains('marked')) {
+      if (tilesMarked<numberBomb(field)) {
       cell.style.backgroundColor = 'yellow';
       cell.classList.add('marked');
       tilesMarked++;
     }
+    }
     else {
-      cell.style.backgroundColor = '#aaa';
+      if (cell.classList.contains('revealed')) {
+        cell.style.backgroundColor = '#888';
+      }
+      else{
+        cell.style.backgroundColor = '#aaa';
+      }
       cell.classList.remove('marked');
       tilesMarked--;
     }
     
-  }
-  // Marcar la celda (puedes cambiar esto según tus necesidades)
+
   
 }
 
