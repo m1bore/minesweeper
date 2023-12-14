@@ -37,7 +37,7 @@
   </style>
 </head>
 <body>
-
+  <p id="counter"></p>
 <script>
 'use strict';
 
@@ -104,7 +104,9 @@ function revealCell(row, col) {
 
 
     }
-    cell.classList.add('revealed');
+    if (!cell.classList.contains('revealed')) {
+      cell.classList.add('revealed');
+    }
   }
 }
 //FIXME:
@@ -235,7 +237,8 @@ function easy() {
 }
 
 function game() {
-  
+  const cell = document.getElementById('counter');
+  cell.textContent = numberBomb(field);
   
 
   crearTabla(field);
