@@ -45,7 +45,7 @@ let field = []; // Debes inicializar field como un array bidimensional
 let tile = 0;
 let bombCount = numberBomb(field);
 
-//TODO:
+//TMP:
 function gameOver() {
   // Reveal all bomb cells
   for (let i = 0; i < field.length; i++) {
@@ -63,7 +63,7 @@ function gameOver() {
     }
   }
 }
-//FIXME:
+//TMP:
 function revealCell(row, col) {
   // Obtener la celda
   const cell = document.getElementById(`cell-${row}-${col}`);
@@ -79,8 +79,15 @@ function revealCell(row, col) {
     gameOver();
   }
   else {
-  cell.textContent = field[row][col];
-  cell.style.backgroundColor = '#888';
+    if (field[row][col] > 0) {
+      cell.textContent = field[row][col];
+      cell.style.backgroundColor = '#888';
+    }
+    else {
+      cell.style.backgroundColor = '#888';
+    }
+  
+  
   }
 }
 
