@@ -37,220 +37,289 @@
   </style>
 </head>
 <body>
-  <p id="counter"></p>
-<script>
-'use strict';
+  <div id="difficulty-container">
+    <label for="difficulty">Selecciona la dificultad:</label>
+    <select id="difficulty">
+      <option value="0">Fácil</option>
+      <option value="1">Intermedio</option>
+      <option value="2">Difícil</option>
+    </select>
+    <button onclick="startGame()">Iniciar Juego</button>
+  </div>
 
-let field = []; // Debes inicializar field como un array bidimensional
-let tile = 0;
-let tilesMarked=0;
+  <div id="game-container">
+    <p id="counter"> </p>
+  </div>
 
-//TMP:
-function gameOver() {
-  // Reveal all bomb cells
-  for (let i = 0; i < field.length; i++) {
-    for (let j = 0; j < field[i].length; j++) {
-      const cell = field[i][j];
-      if (field[i][j] === "b") {
-        const cell = document.getElementById(`cell-${i}-${j}`);
-        const bombImage = document.createElement('img');
-        bombImage.src = 'assets/img/b0b.png';
-        bombImage.alt = 'bomb';
-        cell.innerHTML = '';  // Clear the cell content
-        cell.classList.add('bomb-cell');
-        cell.appendChild(bombImage);
+  <script>
+    'use strict';
+
+    let field = []; // Debes inicializar field como un array bidimensional
+    let tile = 0;
+    let tilesMarked = 0;
+    let mode = [6, 12, 24];
+
+
+    //TMP:
+    function gameOver() {
+      // Reveal all bomb cells
+      for (let i = 0; i < field.length; i++) {
+        for (let j = 0; j < field[i].length; j++) {
+          const cell = field[i][j];
+          if (field[i][j] === "b") {
+            const cell = document.getElementById(`cell-${i}-${j}`);
+            const bombImage = document.createElement('img');
+            bombImage.src = 'assets/img/b0b.png';
+            bombImage.alt = 'bomb';
+            cell.innerHTML = '';  // Clear the cell content
+            cell.classList.add('bomb-cell');
+            cell.appendChild(bombImage);
+          }
+        }
       }
     }
-  }
-}
-//TMP:
-function revealCell(row, col) {
-  // Obtener la celda
-  const cell = document.getElementById(`cell-${row}-${col}`);
-  // Mostrar el contenido de la celda en la casilla
+
+    //TMP:
+    function revealCell(row, col) {
+      const cell = document.getElementById(`cell-${row}-${col}`);
   
-  if (field[row][col] === "b") {
-    const bombImage = document.createElement('img');
-    bombImage.src = 'assets/img/b0b.png';
-    bombImage.alt = 'bomb';
-    cell.innerHTML = '';  // Clear the cell content
-    cell.classList.add('bomb-cell');
-    cell.appendChild(bombImage);
-    gameOver();
-  }
-  else {
-    if (field[row][col] > 0) {
-      cell.textContent = field[row][col];
-      cell.style.backgroundColor = '#888';
-    }
-    else {
-      cell.style.backgroundColor = '#888';
-      const numRows = field.length;
-      const numCols = field[0].length;
-      
-      for (let i = row - 1; i <= row + 1; i++) {
-  for (let j = col - 1; j <= col + 1; j++) {
-    // Verificar si la casilla está dentro de los límites del campo
-    if (i >= 0 && i < numRows && j >= 0 && j < numCols) {
-      const neighborCell = document.getElementById(`cell-${i}-${j}`);
-      // Verificar si la casilla no ha sido revelada aún
-      if (!neighborCell.classList.contains('revealed')) {
-        revealCell(i, j);
-        cell.classList.add('revealed');
+      if (field[row][col] === "b") {
+        revealBomb(cell);
+      } else {
+        revealEmptyCell(row, col);
       }
     }
-  }
-}
-
-
-    }
-    if (!cell.classList.contains('revealed')) {
-      cell.classList.add('revealed');
-    }
-  }
-}
-//FIXME:
-function markCell(event, row, col) {
-
-  // Evitar el menú contextual predeterminado
-  event.preventDefault();
-  // Obtener la celda
-  const cell = document.getElementById(`cell-${row}-${col}`);
-
- 
-    if (!cell.classList.contains('marked')) {
-      if (tilesMarked<numberBomb(field)) {
-      cell.style.backgroundColor = 'yellow';
-      cell.classList.add('marked');
-      tilesMarked++;
-    }
-    }
-    else {
-      if (cell.classList.contains('revealed')) {
-        cell.style.backgroundColor = '#888';
-      }
-      else{
-        cell.style.backgroundColor = '#aaa';
-      }
-      cell.classList.remove('marked');
-      tilesMarked--;
+    function revealBomb(cell) {
+      const bombImage = document.createElement('img');
+      bombImage.src = 'assets/img/b0b.png';
+      bombImage.alt = 'bomb';
+  
+      cell.innerHTML = '';
+      cell.classList.add('bomb-cell');
+      cell.appendChild(bombImage);
+  
+      gameOver();
     }
     
-
+    function revealEmptyCell(row, col) {
+      const cell = document.getElementById(`cell-${row}-${col}`);
   
-}
-
-function numberBomb(array) {
-  if (Array.isArray(array)) {
-    let bc = 0;
-    for (let i = 0; i < array.length; i++) {
-      for (let j = 0; j < array[i].length; j++) {
-        if (array[i][j] === "b") {
-          bc++;
+      if (!cell.classList.contains('revealed')) {
+        cell.classList.add('revealed');
+        cell.style.backgroundColor = '#888';
+    
+        if (field[row][col] > 0) {
+          showNumber(cell, field[row][col]);
+        } else {
+          revealAdjacentCells(row, col);
         }
       }
     }
-    return bc;
-  } else {
-    return 'error';
-  }
-}
 
-function crearTabla(array) {
-  var contenedorTabla = document.body;
-  var tabla = document.createElement('table');
-  var tbody = document.createElement('tbody');
+    function showNumber(cell, number) {
+      cell.textContent = number;
+    }
 
-  array.forEach(function (filaDatos, rowIndex) {
-    var fila = tbody.insertRow();
+    function revealAdjacentCells(row, col) {
+      const numRows = field.length;
+      const numCols = field[0].length;
 
-    filaDatos.forEach(function (dato, colIndex) {
-      var celda = fila.insertCell();
-      celda.textContent = " ";
-      celda.id = `cell-${rowIndex}-${colIndex}`; // Agrega un identificador único a cada celda
+      for (let i = row - 1; i <= row + 1; i++) {
+        for (let j = col - 1; j <= col + 1; j++) {
+          if (isValidCell(i, j, numRows, numCols)) {
+            const neighborCell = document.getElementById(`cell-${i}-${j}`);
+            if (!neighborCell.classList.contains('revealed')) {
+              revealCell(i, j);
+            }
+          }
+        }
+      }
+    }
 
-      // Agregar evento de clic a cada celda
-      celda.addEventListener('click', function() {
-        revealCell(rowIndex, colIndex);
+    function isValidCell(row, col, numRows, numCols) {
+      return row >= 0 && row < numRows && col >= 0 && col < numCols;
+    }
+
+   
+    function markCell(event, row, col) {
+      // Evitar el menú contextual predeterminado
+      event.preventDefault();
+      // Obtener la celda
+      const cell = document.getElementById(`cell-${row}-${col}`);
+
+      if (!cell.classList.contains('marked')) {
+        if (tilesMarked < numberBomb(field)) {
+          cell.style.backgroundColor = 'yellow';
+          cell.classList.add('marked');
+          tilesMarked++;
+        }
+      } else {
+        if (cell.classList.contains('revealed')) {
+          cell.style.backgroundColor = '#888';
+        } else {
+          cell.style.backgroundColor = '#aaa';
+        }
+        cell.classList.remove('marked');
+        tilesMarked--;
+      }
+    }
+
+    function numberBomb(array) {
+      if (Array.isArray(array)) {
+        let bc = 0;
+        for (let i = 0; i < array.length; i++) {
+          for (let j = 0; j < array[i].length; j++) {
+            if (array[i][j] === "b") {
+              bc++;
+            }
+          }
+        }
+        return bc;
+      } else {
+        return 'error';
+      }
+    }
+
+    function crearTabla(array) {
+      var contenedorTabla =  document.getElementById('game-container');
+      var tabla = document.createElement('table');
+      tabla.id = 'tabla'; 
+      var tbody = document.createElement('tbody');
+
+      array.forEach(function (filaDatos, rowIndex) {
+        var fila = tbody.insertRow();
+
+        filaDatos.forEach(function (dato, colIndex) {
+          var celda = fila.insertCell();
+          celda.textContent = " ";
+          celda.id = `cell-${rowIndex}-${colIndex}`; // Agrega un identificador único a cada celda
+
+          // Agregar evento de clic a cada celda
+          celda.addEventListener('click', function () {
+            revealCell(rowIndex, colIndex);
+          });
+
+          // Agregar evento de clic derecho a cada celda
+          celda.addEventListener('contextmenu', function (event) {
+            markCell(event, rowIndex, colIndex);
+          });
+        });
       });
 
-      // Agregar evento de clic derecho a cada celda
-      celda.addEventListener('contextmenu', function(event) {
-        markCell(event, rowIndex, colIndex);
-        });
-    });
-  });
+      tabla.appendChild(tbody);
+      contenedorTabla.appendChild(tabla);
+    }
 
-  tabla.appendChild(tbody);
-  contenedorTabla.appendChild(tabla);
-}
+    function countAdjacentBombs(array, row, col) {
+      const numRows = field.length;
+      const numCols = field[0].length;
+      let bombCount = 0;
 
-function countAdjacentBombs(array, row, col) {
-  const numRows = field.length;
-  const numCols = field[0].length;
-  let bombCount = 0;
+      for (let i = row - 1; i <= row + 1; i++) {
+        for (let j = col - 1; j <= col + 1; j++) {
+          // Verificar si la casilla está dentro de los límites del campo
+          if (i >= 0 && i < numRows && j >= 0 && j < numCols) {
+            // Verificar si la casilla contiene una bomba
+            if (field[i][j] === "b") {
+              bombCount++;
+            }
+          }
+        }
+      }
 
-  for (let i = row - 1; i <= row + 1; i++) {
-    for (let j = col - 1; j <= col + 1; j++) {
-      // Verificar si la casilla está dentro de los límites del campo
-      if (i >= 0 && i < numRows && j >= 0 && j < numCols) {
-        // Verificar si la casilla contiene una bomba
-        if (field[i][j] === "b") {
-          bombCount++;
+      // Restar 1 si la casilla actual también contiene una bomba
+      if (field[row][col] === "b") {
+        bombCount--;
+      }
+
+      return bombCount;
+    }
+
+    function createField(level) {
+      for (let i = 0; i < level; i++) {
+        field[i] = []; // Inicializa cada fila como un array
+        const b = ((level * level) / 3);
+        for (let j = 0; j < level; j++) {
+          const rand = getRandomInt(6);
+          if (rand === 5) {
+            field[i][j] = "b";
+          } else {
+            field[i][j] = 0;
+          }
+          tile++;
+        }
+        if (numberBomb(field) >= b) {
+          break;
+        }
+      }
+      for (let i = 0; i < field.length; i++) {
+        for (let j = 0; j < field[i].length; j++) {
+          if (field[i][j] !== "b") {
+            field[i][j] = countAdjacentBombs(field, i, j);
+          }
         }
       }
     }
-  }
 
-  // Restar 1 si la casilla actual también contiene una bomba
-  if (field[row][col] === "b") {
-    bombCount--;
-  }
+    document.getElementById('game-container').style.display = 'none'
+    function startGame() {
+      const difficultySelect = document.getElementById('difficulty');
+      let difficulty = parseInt(difficultySelect.value);
+      
+      // Ocultar el contenedor de dificultad y mostrar el contenedor de juego
+      document.getElementById('difficulty-container').style.display = 'none';
+      document.getElementById('game-container').style.display = 'block';
 
-  return bombCount;
-}
-
-function easy() {
-  for (let i = 0; i < 6; i++) {
-    field[i] = []; // Inicializa cada fila como un array
-    const b = 12;
-    for (let j = 0; j < 6; j++) {
-      const rand = getRandomInt(6);
-      if (rand === 5) {
-        field[i][j] = "b";
-      } else {
-        field[i][j] = 0;
+      game(difficulty);
+    }
+    function resetGame() {
+      if (document.getElementById('tabla')) {
+      // Reiniciar variables y eliminar tabla existente
+      field = [];
+      tile = 0;
+      tilesMarked = 0;
+      const element = document.getElementById("game-container");
+      if (element.childElementCount>1) {
+        for (let i = element.childElementCount; i > 1; i--) {
+          element.removeChild(element.lastChild);
+        }
       }
-      tile++;
-    }
-    if (numberBomb(field) >= b) {
-      break;
-    }
-  }
-  for (let i = 0; i < field.length; i++) {
-    for (let j = 0; j < field[i].length; j++) {
-      if (field[i][j] !== "b") {
-        field[i][j] = countAdjacentBombs(field, i, j);
+      startGame();
       }
+
     }
-  }
-}
 
-function game() {
-  const cell = document.getElementById('counter');
-  cell.textContent = numberBomb(field);
-  
+    function exit() {
+      document.getElementById('difficulty-container').style.display = 'unset';
+      document.getElementById('game-container').style.display = 'none';
+      field = [];
+      tile = 0;
+      tilesMarked = 0;
+      const element = document.getElementById("game-container");
+      if (element.childElementCount>1) {
+        for (let i = element.childElementCount; i > 1; i--) {
+          element.removeChild(element.lastChild);
+        }
+      }
 
-  crearTabla(field);
-}
+    }
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
+    function game(level) {
+      createField(mode[level]);
+      const cell = document.getElementById('counter');
+      cell.textContent = "bombs: " + numberBomb(field);
+      crearTabla(field);
+    }
 
-easy();
-game();
-</script>
 
+
+    function getRandomInt(max) {
+      return Math.floor(Math.random() * Math.floor(max));
+    }
+
+  </script>
+  <br>
+  <button onclick="resetGame()">Reset</button>
+  <button onclick="exit()">Exit</button>
 </body>
 </html>
