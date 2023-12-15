@@ -30,9 +30,14 @@
       max-width: 100%;
       max-height: 100%;
     }
-
+    .marked {
+      background-color: yellow;
+    }
     .bomb-cell {
       background-color: #df6a6a; /* Change the background color for cells with bombs */
+    }
+    .bomb-defuse {
+      background-color: lightgreen; /* Change the background color for cells with bombs */
     }
   </style>
 </head>
@@ -58,28 +63,53 @@
     let tile = 0;
     let tilesMarked = 0;
     let mode = [6, 12, 24];
+    let isWinner = false;
 
 
-    //TMP:
+    
     function gameOver() {
       // Reveal all bomb cells
       for (let i = 0; i < field.length; i++) {
         for (let j = 0; j < field[i].length; j++) {
-          const cell = field[i][j];
           if (field[i][j] === "b") {
             const cell = document.getElementById(`cell-${i}-${j}`);
             const bombImage = document.createElement('img');
             bombImage.src = 'assets/img/b0b.png';
             bombImage.alt = 'bomb';
             cell.innerHTML = '';  // Clear the cell content
-            cell.classList.add('bomb-cell');
+            if (!isWinner) {
+              cell.classList.add('bomb-cell');
+            }
+            else {
+              cell.classList.add('bomb-defuse');
+            }
             cell.appendChild(bombImage);
           }
+          //FIXME:SI dejo el codino no va
+          //cell.removeEventListener('click', revealCell);
+          //cell.removeEventListener('contextmenu', markCell);
         }
       }
+      
+      const message = document.createElement('p');
+      message.textContent = isWinner ? '¡Ganaste!' : '¡Perdiste!';
+      document.getElementById('game-container').appendChild(message);
     }
 
-    //TMP:
+    function tilesRevealed() {
+      let count = 0;
+      for (let i = 0; i < field.length; i++) {
+        for (let j = 0; j < field[i].length; j++) {
+          const cell = document.getElementById(`cell-${i}-${j}`);
+          if (cell.classList.contains('revealed')) {
+            count++;
+          }
+        }
+        
+      }
+      return count;
+    }
+
     function revealCell(row, col) {
       const cell = document.getElementById(`cell-${row}-${col}`);
   
@@ -87,6 +117,10 @@
         revealBomb(cell);
       } else {
         revealEmptyCell(row, col);
+      }
+      if ((tilesMarked+tilesRevealed()===tile)||(tile - numberBomb()===tilesRevealed())) {
+        isWinner=true;
+        gameOver();
       }
     }
     function revealBomb(cell) {
@@ -149,7 +183,6 @@
 
       if (!cell.classList.contains('marked')) {
         if (tilesMarked < numberBomb(field)) {
-          cell.style.backgroundColor = 'yellow';
           cell.classList.add('marked');
           tilesMarked++;
         }
